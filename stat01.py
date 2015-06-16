@@ -37,12 +37,12 @@ for i in range(len(pums['hincp'])):
 pums['logIncome'] = np.log(pums['hincp'])
 
 startOLS = timeit.default_timer()
-incomeOLS = sm.ols(formula = 'logIncome ~ agep + dis + wif + C(st) + fs + noc +  pap + black + otherRace + male + wkhp',
+incomeOLS = sm.ols(formula = 'logIncome ~  agep + dis + wif + fs + noc +  pap + black + otherRace + male + wkhp + C(st) ',
                 data = pums, missing='drop').fit()
 stopOLS = timeit.default_timer()
 timeOLS = stopOLS - startOLS
-print "Run time to fit this model: %s" % timeOLS
-incomeOLS.summary()
+print "Run time to fit this model: %s S" % timeOLS
+print incomeOLS.summary()
 
 
 #Create a logit model that describes the likelihood of being insured
@@ -53,7 +53,7 @@ startLogit = timeit.default_timer()
 insureLogit = sm.logit(formula = 'hicov ~ agep + dis + fs + black + otherRace + male  + hincp',
                        data=pums, missing='drop').fit()
 stopLogit = timeit.default_timer()
-print "Run time to fit this model is: %s" % (stopLogit - startLogit)
-insureLogit.summary()
+print "Run time to fit this model is: %s S" % (stopLogit - startLogit)
+print insureLogit.summary()
 
 
