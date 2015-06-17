@@ -7,6 +7,7 @@
 
 from __future__ import division
 import pandas as pd
+import pandas.stats.plm as plm
 import numpy as np
 import statsmodels.formula.api as sm
 import matplotlib.pyplot as plt
@@ -43,6 +44,18 @@ stopOLS = timeit.default_timer()
 timeOLS = stopOLS - startOLS
 print "Run time to fit this model: %s S" % timeOLS
 print incomeOLS.summary()
+incomeOLSText = incomeOLS.summary().as_text()
+incomeOLSTable = file("C:\Users\jtaylor\Projects\Training\Python\Charts and Tables\Python, Income OLS.txt", 'w')
+incomeOLSTable.write(incomeOLSText)
+incomeOLSTable.close()
+print
+print "The model with robust standard errors"
+incomeOLSRobustSE = incomeOLS.get_robustcov_results(cov_type='HC0', use_t=True)
+print incomeOLSRobustSE.summary()
+incomeOLSRobustSEText = incomeOLSRobustSE.summary().as_text()
+incomeOLSRobustSETable = file("C:\Users\jtaylor\Projects\Training\Python\Charts and Tables\Python, Income OLS Robust.txt", 'w')
+incomeOLSRobustSETable.write(incomeOLSRobustSEText)
+incomeOLSRobustSETable.close()
 
 
 #Create a logit model that describes the likelihood of being insured
@@ -55,5 +68,39 @@ insureLogit = sm.logit(formula = 'hicov ~ agep + dis + fs + black + otherRace + 
 stopLogit = timeit.default_timer()
 print "Run time to fit this model is: %s S" % (stopLogit - startLogit)
 print insureLogit.summary()
+insureLogitText = insureLogit.summary().as_text()
+insureLogitTable = file("C:\Users\jtaylor\Projects\Training\Python\Charts and Tables\Python, Insure Logit.txt", 'w')
+insureLogitTable.write(insureLogitText)
+insureLogitTable.close()
 
+#Use panel data models to explain ticket pricing on airline routes
+"""
+airline = pd.read_csv("C:\Users\jtaylor\Projects\Training\Python\Data\Airline.csv")
+airline = airline.set_index(['route', 'time'])
+airlinePanel = airline.to_panel()
+startRE = timeit.default_timer()
+airlineRE = plm.PanelOLS(y = airlinePanel['lnMktfare'], x=airlinePanel[['mktdistance', 'percentAA', 'percentAS',
+                'percentDL', 'percentHA', 'percentNK', 'percentUA', 'percentUS', 'percentWN', 'passengers', 'percentOther']],
+                time_effects=True, verbose=True)
+stopRE = timeit.default_timer()
+print "The RE model ran in %s" % (stopRE - startRE)
+print airlineRE
+airlineRETable = file("C:\Users\jtaylor\Projects\Training\Python\Charts and Tables\Python: Random Effects.txt", 'w')
+airlineRETable.write(airlineRE)
+airlineRETable.close()
+
+
+
+startFE = timeit.default_timer()
+airlineFE = plm.PanelOLS(y = airlinePanel['lnMktfare'], x=airlinePanel[['mktdistance', 'percentAA', 'percentAS',
+                'percentDL', 'percentHA', 'percentNK', 'percentUA', 'percentUS', 'percentWN', 'passengers', 'percentOther']],
+                entity_effects=True, time_effects=True, verbose=True)
+stopFE = timeit.default_timer()
+print
+print "The FE model ran in %s" % (stopFE - startFE)
+print airlineFE
+airlineFETable = file("C:\Users\jtaylor\Projects\Training\Python\Charts and Tables\Python: Fixed Effects.txt", 'w')
+airlineFETable.write(airlineFE)
+airlineFETable.close()
+"""
 
