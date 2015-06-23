@@ -81,9 +81,10 @@ housing['west'] = housing['region'] == "West"
 housing['south'] = housing['region'] == "South"
 housing['ne'] = housing['region'] == 'NE'
 housing['constant'] = 1
-stopIV = timeit.default_timer()
+startIV = timeit.default_timer()
 housingIV = gmm.IV2SLS(housing['rent'], housing[['hsngval', 'pcturban', 'constant']], instrument= housing[['pcturban', 'faminc', 'west', 'south', 'ne', 'constant']]).fit()
 stopIV = timeit.default_timer()
+print "The algorithm ran in %s s" %(stopIV - startIV)
 
 
 
