@@ -2,7 +2,7 @@
 # Program: stat01.py
 # Project: Python Training
 # Author: Josh Taylor, Greylock Mckinnon Associates
-# Last Edited: 6/16/15
+# Last Edited: 6/23/15
 ########################################################################################################################
 
 from __future__ import division
@@ -10,6 +10,7 @@ import pandas as pd
 import pandas.stats.plm as plm
 import numpy as np
 import statsmodels.formula.api as sm
+from statsmodels.sandbox.regression import gmm
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 import timeit
@@ -73,34 +74,49 @@ insureLogitTable = file("C:\Users\jtaylor\Projects\Training\Python\Charts and Ta
 insureLogitTable.write(insureLogitText)
 insureLogitTable.close()
 
+
+#Use IV regression to estimate a model
+housing = pd.read_csv("C:\Users\jtaylor\Projects\Training\Python\Data\housing.csv")
+housing['west'] = housing['region'] == "West"
+housing['south'] = housing['region'] == "South"
+housing['ne'] = housing['region'] == 'NE'
+housing['constant'] = 1
+stopIV = timeit.default_timer()
+housingIV = gmm.IV2SLS(housing['rent'], housing[['hsngval', 'pcturban', 'constant']], instrument= housing[['pcturban', 'faminc', 'west', 'south', 'ne', 'constant']]).fit()
+stopIV = timeit.default_timer()
+
+
+
+
 #Use panel data models to explain ticket pricing on airline routes
-"""
+
 airline = pd.read_csv("C:\Users\jtaylor\Projects\Training\Python\Data\Airline.csv")
+airline['constant'] = 1
 airline = airline.set_index(['route', 'time'])
 airlinePanel = airline.to_panel()
 startRE = timeit.default_timer()
-airlineRE = plm.PanelOLS(y = airlinePanel['lnMktfare'], x=airlinePanel[['mktdistance', 'percentAA', 'percentAS',
-                'percentDL', 'percentHA', 'percentNK', 'percentUA', 'percentUS', 'percentWN', 'passengers', 'percentOther']],
-                time_effects=True, verbose=True)
+airlineRE = plm.PanelOLS(y = airlinePanel['lnMktfare'], x=airlinePanel[['constant', 'mktdistance', 'passengers', 'percentAA', 'percentAS',
+                'percentDL', 'percentHA', 'percentNK', 'percentUA', 'percentUS', 'percentWN']],
+                time_effects=True, dropped_dummies=True, verbose=True)
 stopRE = timeit.default_timer()
 print "The RE model ran in %s" % (stopRE - startRE)
 print airlineRE
-airlineRETable = file("C:\Users\jtaylor\Projects\Training\Python\Charts and Tables\Python: Random Effects.txt", 'w')
-airlineRETable.write(airlineRE)
-airlineRETable.close()
+# airlineRETable = file("C:\Users\jtaylor\Projects\Training\Python\Charts and Tables\Python: Random Effects.txt", 'w')
+# airlineRETable.write(airlineRE)
+# airlineRETable.close()
 
 
 
 startFE = timeit.default_timer()
-airlineFE = plm.PanelOLS(y = airlinePanel['lnMktfare'], x=airlinePanel[['mktdistance', 'percentAA', 'percentAS',
-                'percentDL', 'percentHA', 'percentNK', 'percentUA', 'percentUS', 'percentWN', 'passengers', 'percentOther']],
-                entity_effects=True, time_effects=True, verbose=True)
+airlineFE = plm.PanelOLS(y = airlinePanel['lnMktfare'], x=airlinePanel[['constant', 'mktdistance', 'passengers', 'percentAA', 'percentAS',
+                'percentDL', 'percentHA', 'percentNK', 'percentUA', 'percentUS', 'percentWN']],
+                entity_effects=True, time_effects=True, dropped_dummies= True, verbose=True)
 stopFE = timeit.default_timer()
 print
 print "The FE model ran in %s" % (stopFE - startFE)
 print airlineFE
-airlineFETable = file("C:\Users\jtaylor\Projects\Training\Python\Charts and Tables\Python: Fixed Effects.txt", 'w')
-airlineFETable.write(airlineFE)
-airlineFETable.close()
-"""
+# airlineFETable = file("C:\Users\jtaylor\Projects\Training\Python\Charts and Tables\Python: Fixed Effects.txt", 'w')
+# airlineFETable.write(airlineFE)
+# airlineFETable.close()
+
 

@@ -2,7 +2,7 @@
 *Program: stat01.do
 *Project: Python Training
 *Author: Josh Taylor, Greylock McKinnnon Associates
-*Last Edited: 6/17/15
+*Last Edited: 6/23/15
 ********************************************************************************
 capture log close
 log using "C:\Users\jtaylor\Projects\Training\Python\Code\Log\stat01Log.smcl", append
@@ -48,11 +48,35 @@ outreg2 using "Stata, Insure Logit.rtf", replace ctitle("Logit", "`time3' s")
 
 
 
-log close
+use http://www.stata-press.com/data/r13/hsng, clear
+
+timer on 4
+ivregress 2sls rent pcturban (hsngval = faminc i.region)
+timer off 4
+qui timer list
+local time4 = r(t4)
+outreg2 using "Stata, Housing IV.rtf", replace ctitle("IV", "`time4' s")
 
 
+import delimited "C:\Users\jtaylor\Projects\Training\Python\Data\Airline.csv", clear
+encode route, gen(market)
+xtset market time
+
+timer on 5
+xtreg lnmktfare mktdistance passengers percent*
+timer off 5
+qui timer list
+local time5 = r(t5)
+outreg2 using "Stata, Airline Panel.rtf", replace ctitle("RE", "`time5' s")
+ 
 
 
+timer on 6
+xtreg lnmktfare mktdistance passengers percent*, fe
+timer off 6
+qui timer list
+local time5 = r(t6)
+outreg2 using "Stata, Airline Panel.rtf",  ctitle("FE", "`time6' s")
 
 
 
