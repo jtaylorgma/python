@@ -2,7 +2,7 @@
 # Program: stat01.py
 # Project: Python Training
 # Author: Josh Taylor, Greylock Mckinnon Associates
-# Last Edited: 6/23/15
+# Last Edited: 6/25/15
 ########################################################################################################################
 
 from __future__ import division
@@ -92,13 +92,13 @@ print "The algorithm ran in %s s" %(stopIV - startIV)
 #Use panel data models to explain ticket pricing on airline routes
 
 airline = pd.read_csv("C:\Users\jtaylor\Projects\Training\Python\Data\Airline.csv")
-airline['constant'] = 1
+airline['constant'] = 1.0
 airline = airline.set_index(['route', 'time'])
 airlinePanel = airline.to_panel()
 startRE = timeit.default_timer()
-airlineRE = plm.PanelOLS(y = airlinePanel['lnMktfare'], x=airlinePanel[['constant', 'mktdistance', 'passengers', 'percentAA', 'percentAS',
+airlineRE = plm.PanelOLS(y = airlinePanel['lnMktfare'], x=airlinePanel[[ 'mktdistance', 'passengers', 'percentAA', 'percentAS',
                 'percentDL', 'percentHA', 'percentNK', 'percentUA', 'percentUS', 'percentWN']],
-                time_effects=True, dropped_dummies=True, verbose=True)
+                intercept= True, time_effects=True, dropped_dummies=True, verbose=True)
 stopRE = timeit.default_timer()
 print "The RE model ran in %s" % (stopRE - startRE)
 print airlineRE
@@ -107,11 +107,11 @@ print airlineRE
 # airlineRETable.close()
 
 
-
+"""
 startFE = timeit.default_timer()
-airlineFE = plm.PanelOLS(y = airlinePanel['lnMktfare'], x=airlinePanel[['constant', 'mktdistance', 'passengers', 'percentAA', 'percentAS',
+airlineFE = plm.PanelOLS(y = airlinePanel['lnMktfare'], x=airlinePanel[['mktdistance', 'passengers', 'percentAA', 'percentAS',
                 'percentDL', 'percentHA', 'percentNK', 'percentUA', 'percentUS', 'percentWN']],
-                entity_effects=True, time_effects=True, dropped_dummies= True, verbose=True)
+                intercept=True, entity_effects=True, time_effects=True, dropped_dummies= True, verbose=True)
 stopFE = timeit.default_timer()
 print
 print "The FE model ran in %s" % (stopFE - startFE)
@@ -119,5 +119,5 @@ print airlineFE
 # airlineFETable = file("C:\Users\jtaylor\Projects\Training\Python\Charts and Tables\Python: Fixed Effects.txt", 'w')
 # airlineFETable.write(airlineFE)
 # airlineFETable.close()
-
+"""
 

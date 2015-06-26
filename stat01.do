@@ -63,7 +63,7 @@ encode route, gen(market)
 xtset market time
 
 timer on 5
-xtreg lnmktfare mktdistance passengers percent*
+xtreg lnmktfare mktdistance passengers i.time percent*, 
 timer off 5
 qui timer list
 local time5 = r(t5)
